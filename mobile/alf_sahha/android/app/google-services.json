@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "311637296801",
+    "project_id": "alfsahha-75033",
+    "storage_bucket": "alfsahha-75033.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311637296801:android:b1f3267b762ee056e452e0",
+        "android_client_info": {
+          "package_name": "com.example.alf_sahha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1ES5W8HbcOa_kp1-kSSEHqJyBXROal_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

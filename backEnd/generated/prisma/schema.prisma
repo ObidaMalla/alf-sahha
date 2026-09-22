@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  OWNER
+  EMPLOYEE
+}
+
+enum MenuCategory {
+  FOOD
+  DRINK
+  DESSERT
+}
+
+enum InviteCodeStatus {
+  PENDING
+  USED
+  EXPIRED
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  COMPLETED
+  REJECTED
+  EXPIRED
+}
+
+enum TransactionType {
+  SIGNUP_BONUS
+  ORDER_PAYMENT
+}
+
+enum NotificationType {
+  ORDER_ACCEPTED
+  ORDER_REJECTED
+  ORDER_EXPIRED_CUSTOMER
+  ORDER_EXPIRED_EMPLOYEE
+  PAYMENT_RECEIVED
+  ORDER_READY
+  WELCOME
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  passwordHash  String   @map("password_hash")
+  phone         String?
+  role          Role     @default(CUSTOMER)
+  fcmToken      String?  @map("fcm_token")
+  walletBalance Decimal  @default(1000.00) @map("wallet_balance") @db.Decimal(10, 2)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  ownedRestaurant      Restaurant?      @relation("RestaurantOwner")
+  staffRecord          RestaurantStaff?
+  orders               Order[]
+  sentTransactions     Transaction[]    @relation("TransactionSender")
+  receivedTransactions Transaction[]    @relation("TransactionReceiver")
+  notifications        Notification[]
+  handledOrders        Order[]          @relation("OrderHandledBy")
+
+  @@map("users")
+}
+
+model Restaurant {
+  id          String   @id @default(uuid())
+  ownerId     String   @unique @map("owner_id")
+  name        String
+  description String?
+  address     String?
+  imageUrl    String?  @map("image_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  owner       User                   @relation("RestaurantOwner", fields: [ownerId], references: [id])
+  staff       RestaurantStaff[]
+  inviteCodes RestaurantInviteCode[]
+  menuItems   MenuItem[]
+  orders      Order[]
+
+  @@map("restaurants")
+}
+
+model RestaurantStaff {
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
+  restaurantId String   @map("restaurant_id")
+  inviteCodeId String?  @unique @map("invite_code_id")
+  joinedAt     DateTime @default(now()) @map("joined_at")
+
+  user       User                  @relation(fields: [userId], references: [id])
+  restaurant Restaurant            @relation(fields: [restaurantId], references: [id])
+  inviteCode RestaurantInviteCode? @relation(fields: [inviteCodeId], references: [id])
+
+  @@map("restaurant_staff")
+}
+
+model RestaurantInviteCode {
+  id           String           @id @default(uuid())
+  code         String           @unique
+  restaurantId String           @map("restaurant_id")
+  status       InviteCodeStatus @default(PENDING)
+  expiresAt    DateTime         @map("expires_at")
+  usedAt       DateTime?        @map("used_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  restaurant Restaurant       @relation(fields: [restaurantId], references: [id])
+  staffLink  RestaurantStaff?
+
+  @@map("restaurant_invite_codes")
+}
+
+model MenuItem {
+  id           String       @id @default(uuid())
+  restaurantId String       @map("restaurant_id")
+  name         String
+  description  String
+  price        Decimal      @db.Decimal(10, 2)
+  category     MenuCategory
+  imageUrl     String?      @map("image_url")
+  isAvailable  Boolean      @default(true) @map("is_available")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("menu_items")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  customerId      String      @map("customer_id")
+  restaurantId    String      @map("restaurant_id")
+  handledByUserId String?     @map("handled_by_user_id")
+  status          OrderStatus @default(PENDING)
+  rejectionReason String?     @map("rejection_reason")
+  totalPrice      Decimal     @map("total_price") @db.Decimal(10, 2)
+  acceptedAt      DateTime?   @map("accepted_at")
+  paidAt          DateTime?   @map("paid_at")
+  completedAt     DateTime?   @map("completed_at")
+  rejectedAt      DateTime?   @map("rejected_at")
+  expiredAt       DateTime?   @map("expired_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  customer      User           @relation(fields: [customerId], references: [id])
+  restaurant    Restaurant     @relation(fields: [restaurantId], references: [id])
+  handledBy     User?          @relation("OrderHandledBy", fields: [handledByUserId], references: [id])
+  items         OrderItem[]
+  transactions  Transaction[]
+  notifications Notification[]
+
+  @@index([status, createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  orderId    String  @map("order_id")
+  menuItemId String  @map("menu_item_id")
+  quantity   Int
+  unitPrice  Decimal @map("unit_price") @db.Decimal(10, 2)
+  note       String? @map("note") // 👈 جديد: ملاحظة الزبون على هاد الصنف تحديدًا، مثل "بدون بصل"
+
+  order    Order    @relation(fields: [orderId], references: [id])
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@map("order_items")
+}
+
+model Transaction {
+  id         String          @id @default(uuid())
+  orderId    String?         @map("order_id")
+  fromUserId String?         @map("from_user_id")
+  toUserId   String          @map("to_user_id")
+  amount     Decimal         @db.Decimal(10, 2)
+  type       TransactionType
+  createdAt  DateTime        @default(now()) @map("created_at")
+
+  order    Order? @relation(fields: [orderId], references: [id])
+  fromUser User?  @relation("TransactionSender", fields: [fromUserId], references: [id])
+  toUser   User   @relation("TransactionReceiver", fields: [toUserId], references: [id])
+
+  @@map("transactions")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  orderId   String?          @map("order_id")
+  type      NotificationType
+  message   String
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user  User   @relation(fields: [userId], references: [id])
+  order Order? @relation(fields: [orderId], references: [id])
+
+  @@map("notifications")
+}
+
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("blacklisted_tokens")
+}

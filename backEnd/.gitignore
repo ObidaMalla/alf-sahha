@@ -1,0 +1,32 @@
+# التبعيات
+node_modules/
+
+# الأسرار — الأهم إطلاقًا
+.env
+.env.local
+.env.*.local
+
+# أي ملف اعتماد خدمة خارجية (Firebase, Cloudinary, إلخ)
+firebase-service-account.json
+*serviceAccountKey*.json
+
+# ملفات build/logs
+dist/
+build/
+logs/
+*.log
+
+# قاعدة بيانات محلية (لو مستخدم SQLite أو Prisma migrations dev)
+prisma/migrations/dev.db
+
+# نظام
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+project_file/
+
+# ملفات Word المؤقتة
+~$*
+*.docx
