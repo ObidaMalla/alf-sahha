@@ -4,6 +4,7 @@ import { protect } from "../middlewares/authMiddleware.js";
 
 
 const router = express.Router();
+//Sprint 1
 
 router.post("/register", register);
 router.post("/login", login);
