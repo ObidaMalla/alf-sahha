@@ -12,7 +12,7 @@ part of 'menu_item_routes.dart';
 
 class _MenuItemService implements MenuItemService {
   _MenuItemService(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://localhost:3000/api';
+    baseUrl ??= 'https://alf-sahha.onrender.com/api';
   }
 
   final Dio _dio;

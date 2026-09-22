@@ -12,7 +12,7 @@ part of 'notifications_routes.dart';
 
 class _NotificationsService implements NotificationsService {
   _NotificationsService(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://localhost:3000/api';
+    baseUrl ??= 'https://alf-sahha.onrender.com/api';
   }
 
   final Dio _dio;

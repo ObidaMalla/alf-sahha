@@ -1,5 +1,5 @@
 abstract class ApiConstants {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'https://alf-sahha.onrender.com/api';
 }
 
 /*

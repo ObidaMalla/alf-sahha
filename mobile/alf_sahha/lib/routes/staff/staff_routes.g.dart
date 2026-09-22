@@ -12,7 +12,7 @@ part of 'staff_routes.dart';
 
 class _StaffService implements StaffService {
   _StaffService(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'http://localhost:3000/api';
+    baseUrl ??= 'https://alf-sahha.onrender.com/api';
   }
 
   final Dio _dio;
