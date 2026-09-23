@@ -102,12 +102,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
 
     if (role == 'CUSTOMER') {
-      // 👈 استبدال شاشة المنيو بشاشة المطاعم للزبون
-      pages.add(const RestaurantsScreen());
-      navItems.add(
-        const _NavItemData(icon: Icons.storefront_rounded, label: 'المطاعم'),
-      );
-
       pages.add(const MyOrdersScreen());
       navItems.add(
         const _NavItemData(icon: Icons.receipt_long_rounded, label: 'طلباتي'),

@@ -34,7 +34,7 @@ RestaurantStatsData _$RestaurantStatsDataFromJson(Map<String, dynamic> json) =>
               json['ordersByStatus'] as Map<String, dynamic>,
             ),
       totalOrders: (json['totalOrders'] as num?)?.toInt(),
-      totalRevenue: json['totalRevenue'] as String?,
+      totalRevenue: json['totalRevenue'] as num?,
     );
 
 Map<String, dynamic> _$RestaurantStatsDataToJson(

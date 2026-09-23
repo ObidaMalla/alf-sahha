@@ -25,7 +25,7 @@ class RestaurantStatsModel {
 class RestaurantStatsData {
   OrdersByStatus? ordersByStatus;
   int? totalOrders;
-  String? totalRevenue;
+  num? totalRevenue; // <-- بدل String?
 
   RestaurantStatsData({
     this.ordersByStatus,

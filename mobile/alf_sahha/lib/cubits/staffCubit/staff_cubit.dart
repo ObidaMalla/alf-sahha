@@ -10,14 +10,20 @@ class GetStaffCubit extends Cubit<ResultState<GetStaffModel>> {
   GetStaffCubit(this.staffRepo) : super(const ResultState.idle());
 
   Future<void> getStaff({required String restaurantId}) async {
+    if (isClosed) return;
     emit(const ResultState.loading());
+
     try {
       final response = await staffRepo.getStaff(restaurantId: restaurantId);
       debugPrint('✅ [GetStaffCubit] Success: ${response.message}');
+
+      if (isClosed) return; // <-- الإضافة المهمة
       emit(ResultState.success(response));
     } catch (error) {
       final String message = error is String ? error : error.toString();
       debugPrint('❌ [GetStaffCubit] $message');
+
+      if (isClosed) return; // <-- وهون كمان
       emit(ResultState.error(message));
     }
   }
@@ -28,7 +34,6 @@ class GetStaffCubit extends Cubit<ResultState<GetStaffModel>> {
 class DeleteStaffCubit extends Cubit<ResultState<DeleteStaffModel>> {
   final StaffRepository staffRepo;
   DeleteStaffCubit(this.staffRepo) : super(const ResultState.idle());
-
   Future<void> deleteStaff({
     required String restaurantId,
     required String staffId,
@@ -37,7 +42,7 @@ class DeleteStaffCubit extends Cubit<ResultState<DeleteStaffModel>> {
       loading: () => true,
       orElse: () => false,
     );
-    if (isAlreadyLoading) return;
+    if (isAlreadyLoading || isClosed) return;
 
     emit(const ResultState.loading());
     try {
@@ -46,10 +51,14 @@ class DeleteStaffCubit extends Cubit<ResultState<DeleteStaffModel>> {
         staffId: staffId,
       );
       debugPrint('✅ [DeleteStaffCubit] Success: ${response.message}');
+
+      if (isClosed) return;
       emit(ResultState.success(response));
     } catch (error) {
       final String message = error is String ? error : error.toString();
       debugPrint('❌ [DeleteStaffCubit] $message');
+
+      if (isClosed) return;
       emit(ResultState.error(message));
     }
   }

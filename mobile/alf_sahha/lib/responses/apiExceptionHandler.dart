@@ -25,7 +25,6 @@ class ApiExceptionHandler {
         final serverMessage = responseData['message'].toString().trim();
         if (serverMessage.isNotEmpty) throw serverMessage;
       }
-
       switch (e.type) {
         case DioExceptionType.connectionError:
           throw 'تحقق من اتصال الإنترنت 🧨';
@@ -35,8 +34,10 @@ class ApiExceptionHandler {
           throw 'انتهى وقت إرسال الطلب 🧨';
         case DioExceptionType.receiveTimeout:
           throw 'انتهى الوقت، يرجى المحاولة مرة أخرى 🧨';
+        case DioExceptionType.badResponse:
+          throw 'خطأ من السيرفر (${e.response?.statusCode}) 🧨';
         default:
-          throw 'حدث خطأ تقني، حاول لاحقاً 🧨';
+          throw 'حدث خطأ تقني، حاول لاحقاً 🧨 (${e.type})';
       }
     } catch (e) {
       if (e is String) rethrow;
