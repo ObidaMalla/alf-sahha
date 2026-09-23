@@ -38,17 +38,15 @@ class _WalletScreenState extends State<WalletScreen> {
       case 'WITHDRAWAL':
         return 'سحب رصيد';
       case 'SIGNUP_BONUS':
-        return 'مكافأة التسجيل'; // 👈 تمت إضافة ترجمة المكافأة
+        return 'مكافأة التسجيل';
       default:
         return type ?? 'معاملة';
     }
   }
 
-  // هل المعاملة "دخل" (بالإضافة) أو "خرج" (بالخصم) — لتحديد اللون والإشارة
-  bool _isIncoming(String? type) {
-    return type == 'REFUND' ||
-        type == 'TOP_UP' ||
-        type == 'SIGNUP_BONUS'; // 👈 اعتبار مكافأة التسجيل معاملة دخول (إضافة)
+  // تحديد ما إذا كانت المعاملة إضافة بناءً على السيرفر (CREDIT)
+  bool _isIncoming(WalletTransaction tx) {
+    return tx.direction == 'CREDIT';
   }
 
   IconData _typeIcon(String? type) {
@@ -62,7 +60,7 @@ class _WalletScreenState extends State<WalletScreen> {
       case 'WITHDRAWAL':
         return Icons.remove_circle_rounded;
       case 'SIGNUP_BONUS':
-        return Icons.card_giftcard_rounded; // 👈 أيقونة خاصة لمكافأة التسجيل
+        return Icons.card_giftcard_rounded;
       default:
         return Icons.receipt_long_rounded;
     }
@@ -262,9 +260,11 @@ class _WalletScreenState extends State<WalletScreen> {
   // كارت معاملة واحدة
   // ============================================================
   Widget _buildTransactionTile(WalletTransaction tx) {
-    final incoming = _isIncoming(tx.type);
+    final incoming = _isIncoming(tx);
     final color = incoming ? AppColors.successColor : AppColors.spicyColor;
-    final amount = num.tryParse(tx.amount ?? '0') ?? 0;
+
+    // استخدام signedAmount القادم جاهز من السيرفر (مثل "+85" أو "-50")
+    final displayAmount = tx.signedAmount ?? tx.amount ?? '0';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -309,7 +309,7 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
           ),
           Text(
-            '${incoming ? '+' : '-'}${amount.toStringAsFixed(0)} ل.س',
+            '$displayAmount ل.س',
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.w800,

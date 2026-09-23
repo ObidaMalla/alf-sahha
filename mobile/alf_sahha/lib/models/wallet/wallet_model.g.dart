@@ -38,14 +38,16 @@ Map<String, dynamic> _$WalletDataToJson(WalletData instance) =>
 
 WalletTransaction _$WalletTransactionFromJson(Map<String, dynamic> json) =>
     WalletTransaction(
-      id: json['id'] as String?,
-      orderId: json['orderId'] as String?,
-      fromUserId: json['fromUserId'] as String?,
-      toUserId: json['toUserId'] as String?,
-      amount: json['amount'] as String?,
-      type: json['type'] as String?,
-      createdAt: json['createdAt'] as String?,
-    );
+        id: json['id'] as String?,
+        orderId: json['orderId'] as String?,
+        fromUserId: json['fromUserId'] as String?,
+        toUserId: json['toUserId'] as String?,
+        amount: json['amount'] as String?,
+        type: json['type'] as String?,
+        createdAt: json['createdAt'] as String?,
+      )
+      ..direction = json['direction'] as String?
+      ..signedAmount = json['signedAmount'] as String?;
 
 Map<String, dynamic> _$WalletTransactionToJson(WalletTransaction instance) =>
     <String, dynamic>{
@@ -56,4 +58,6 @@ Map<String, dynamic> _$WalletTransactionToJson(WalletTransaction instance) =>
       'amount': instance.amount,
       'type': instance.type,
       'createdAt': instance.createdAt,
+      'direction': instance.direction,
+      'signedAmount': instance.signedAmount,
     };

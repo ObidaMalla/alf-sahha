@@ -37,6 +37,9 @@ class WalletTransaction {
   String? amount;
   String? type;
   String? createdAt;
+  String? direction;
+
+  String? signedAmount;
 
   WalletTransaction({
     this.id,
